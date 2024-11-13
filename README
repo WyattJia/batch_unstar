@@ -1,0 +1,127 @@
+batch_unstar
+===========
+
+batch_unstar is a tool for managing GitHub starred repositories in batch.
+It helps users export their starred repositories to CSV and batch unstar them.
+
+
+REQUIREMENTS
+-----------
+
+  - Python 3.6+
+  - virtualenv or venv (recommended)
+  - GitHub Personal Access Token (with read:user and user scopes)
+  - Any CSV editor
+
+
+INSTALLATION
+-----------
+
+1. Get the code:
+     git clone https://github.com/yourusername/batch_unstar.git
+     cd batch_unstar
+
+2. Set up Python virtual environment:
+
+   On Linux/Mac:
+     python -m venv .venv
+     source .venv/bin/activate
+     
+   On Windows:
+     python -m venv .venv
+     .venv\Scripts\activate
+
+3. Install dependencies:
+     pip install -r requirements.txt
+
+4. Configure:
+     cp config.yaml.example config.yaml
+     # Edit config.yaml and add your GitHub token
+
+
+USAGE
+-----
+
+1. Export starred repos:
+     python fetch_stars.py
+     # Find generated starred_repos.csv
+
+2. Mark repos to unstar:
+     - Open starred_repos.csv
+     - Set "unstar" column to "Yes" for repos to unstar
+     - Save file
+
+3. Unstar repos:
+     python unstar_repos.py
+
+
+CONFIGURATION
+------------
+
+config.yaml format:
+  github:
+    token: "your-github-token-here"
+
+To get GitHub token:
+  1. Visit: GitHub Settings -> Developer settings -> Personal access tokens
+  2. Generate new token with read:user and user scopes
+  3. Copy token to config.yaml
+
+
+RATE LIMITING
+------------
+
+The scripts implement rate limiting to comply with GitHub API restrictions:
+
+  fetch_stars.py:   0.5s between requests
+  unstar_repos.py:  1.0s between requests
+
+Both scripts will pause automatically when approaching GitHub's rate limits.
+
+
+IMPORTANT NOTES
+-------------
+
+  - BACKUP your starred repos list before running these scripts
+  - Test with few repos first
+  - CSV uses UTF-8 encoding
+  - Rate limits are handled automatically
+  - Always use virtual environment
+  - Don't commit your config.yaml file
+
+
+TROUBLESHOOTING
+--------------
+
+Common issues:
+
+  Q: Config file not found
+  A: Ensure you copied config.yaml.example to config.yaml
+
+  Q: Authentication error
+  A: Check if token in config.yaml is valid and has correct permissions
+
+  Q: CSV file appears empty
+  A: Ensure you have starred repositories and token has read access
+
+  Q: Unstarring takes too long
+  A: This is normal due to rate limiting. Each operation takes 1s
+
+
+REPORTING BUGS
+-------------
+
+Send bug reports to:
+  - Email: i@eventloop.live
+  - GitHub Issues: https://github.com/WyattJia/batch_unstar/issues
+
+Include:
+  - Python version
+  - Error messages
+  - Steps to reproduce
+
+
+AUTHORS
+-------
+
+Wyatt Jia<i@eventloop.live>
