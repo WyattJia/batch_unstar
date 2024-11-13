@@ -12,13 +12,14 @@ class GitHubStarRemover:
             'Accept': 'application/vnd.github.v3+json'
         }
         self.base_url = "https://api.github.com"
-        self.rate_limit_delay = 1  # 1秒间隔，比获取数据时更保守
+        # Set a conservative delay of 1 second between requests
+        self.rate_limit_delay = 1
 
     def unstar_repository(self, repo_full_name):
         url = f"{self.base_url}/user/starred/{repo_full_name}"
         response = requests.delete(url, headers=self.headers)
         
-        if response.status_code == 204:  # GitHub API 返回204表示成功
+        if response.status_code == 204:  # GitHub API returns 204 for successful unstar
             print(f"Successfully unstarred: {repo_full_name}")
             return True
         else:
@@ -31,7 +32,7 @@ class GitHubStarRemover:
         with open(filename, 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             for row in reader:
-                if row['unstar'].lower() == 'yes':
+                if row['unstar'] == '1':
                     if self.unstar_repository(row['full_name']):
                         unstarred_count += 1
                     time.sleep(self.rate_limit_delay)
