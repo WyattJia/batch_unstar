@@ -1,10 +1,21 @@
-import requests
+"""GitHub starred repositories fetcher.
+
+This module provides functionality to fetch and export all starred repositories
+from a GitHub account to a CSV file.
+"""
+
 import csv
 import time
 from datetime import datetime
+
+import requests
+
 from config import load_config
 
+
 class GitHubStarsFetcher:
+    """Fetches starred repositories from GitHub and exports them to CSV."""
+
     def __init__(self):
         config = load_config()
         self.token = config['github']['token']
@@ -13,7 +24,6 @@ class GitHubStarsFetcher:
             'Accept': 'application/vnd.github.v3+json'
         }
         self.base_url = "https://api.github.com"
-        # Consider GitHub API rate limits (5000 requests per hour)
         self.rate_limit_delay = 0.5  # 500ms between requests
         self.per_page = 100  # Maximum items per page
 
@@ -151,16 +161,20 @@ class GitHubStarsFetcher:
             print(f"Error saving to CSV: {str(e)}")
 
 def main():
+    """Entry point for the GitHub stars fetcher."""
     try:
         fetcher = GitHubStarsFetcher()
         print("Starting to fetch starred repositories...")
-        
         repos = fetcher.get_starred_repos()
         fetcher.save_to_csv(repos)
-        
         print(f"Completed! Fetched {len(repos)} repositories")
-    except Exception as e:
+    except requests.RequestException as e:
+        print(f"API request error: {str(e)}")
+    except IOError as e:
+        print(f"File operation error: {str(e)}")
+    except Exception as e:  # pylint: disable=broad-except
         print(f"Fatal error: {str(e)}")
+
 
 if __name__ == "__main__":
     main() 

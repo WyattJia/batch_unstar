@@ -1,9 +1,20 @@
+"""GitHub repository unstarring tool.
+
+This module provides functionality to batch unstar GitHub repositories
+based on a CSV input file.
+"""
+
 import csv
-import requests
 import time
+
+import requests
+
 from config import load_config
 
+
 class GitHubStarRemover:
+    """Handles the unstarring of GitHub repositories."""
+
     def __init__(self):
         config = load_config()
         self.token = config['github']['token']
@@ -12,19 +23,25 @@ class GitHubStarRemover:
             'Accept': 'application/vnd.github.v3+json'
         }
         self.base_url = "https://api.github.com"
-        # Set a conservative delay of 1 second between requests
         self.rate_limit_delay = 1
 
     def unstar_repository(self, repo_full_name):
+        """Unstar a single GitHub repository.
+        
+        Args:
+            repo_full_name (str): Full name of repository (owner/repo)
+            
+        Returns:
+            bool: True if unstarring was successful, False otherwise
+        """
         url = f"{self.base_url}/user/starred/{repo_full_name}"
         response = requests.delete(url, headers=self.headers)
         
         if response.status_code == 204:  # GitHub API returns 204 for successful unstar
             print(f"Successfully unstarred: {repo_full_name}")
             return True
-        else:
-            print(f"Failed to unstar {repo_full_name}: {response.status_code}")
-            return False
+        print(f"Failed to unstar {repo_full_name}: {response.status_code}")
+        return False
 
     def process_csv(self, filename='starred_repos.csv', skip_rows=382):
         """Process CSV file to unstar repositories.
@@ -82,11 +99,15 @@ class GitHubStarRemover:
             return 0
 
 def main():
-    remover = GitHubStarRemover()
-    print("Starting to process unstar requests...")
-    
-    unstarred_count = remover.process_csv()
-    print(f"Completed! Unstarred {unstarred_count} repositories")
+    """Entry point for the GitHub stars remover."""
+    try:
+        remover = GitHubStarRemover()
+        print("Starting to process unstar requests...")
+        unstarred_count = remover.process_csv()
+        print(f"Completed! Unstarred {unstarred_count} repositories")
+    except (requests.RequestException, IOError) as e:
+        print(f"Operation failed: {str(e)}")
+
 
 if __name__ == "__main__":
     main() 
